@@ -1,8 +1,9 @@
 import RPi.GPIO as GPIO
-
+import time
 # defines the 12 key, 7 pin phone keypad
 class Keypad:
     def __init__(self, row_pins, col_pins):
+        self.debounceTime = 20 / 1000.0
         self.row_pins = row_pins
         self.col_pins = col_pins
         self.keypad = [
@@ -20,22 +21,34 @@ class Keypad:
         GPIO.setmode(GPIO.BCM)
 
     def get_key(self):
-        for j in range(len(self.col_pins)):
-            GPIO.setup(self.col_pins[j], GPIO.OUT)
-            GPIO.output(self.col_pins[j], GPIO.LOW)
+        # Set up rows as inputs with pull-up resistors
+        for row_pin in self.row_pins:
+            GPIO.setup(row_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-        for i in range(len(self.row_pins)):
-            GPIO.setup(self.row_pins[i], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        # Set up columns as outputs
+        for col_pin in self.col_pins:
+            GPIO.setup(col_pin, GPIO.OUT)
 
-        for j in range(len(self.col_pins)):
-            GPIO.setup(self.col_pins[j], GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-            for i in range(len(self.row_pins)):
-                if GPIO.input(self.row_pins[i]) == 0:
-                    return [self.keypad[i][j], self.toneMap[i][j]]
+        # Scan each column
+        for i, col_pin in enumerate(self.col_pins):
+            # Set column output low
+            GPIO.output(col_pin, GPIO.LOW)
 
-            GPIO.setup(self.col_pins[j], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            # Scan each row
+            for j, row_pin in enumerate(self.row_pins):
+                # Check if key is pressed
+                if not GPIO.input(row_pin):
+                    # Wait for key release
+                    time.sleep(self.debounceTime)
+                    while not GPIO.input(row_pin):
+                        time.sleep(self.debounceTime)
+                    return self.keypad[j][i]
 
-        return None
+            # Set column output high
+            GPIO.output(col_pin, GPIO.HIGH)
+
+            # Wait for column to settle
+            time.sleep(self.debounceTime)
 
     def cleanup(self):
         GPIO.cleanup()

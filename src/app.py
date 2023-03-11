@@ -1,18 +1,17 @@
 from hardware.keypad import Keypad
-import threading
-
+import RPi.GPIO as GPIO
+GPIO.setwarnings(False)
 # Pin configuration
-ROW_PINS = [1, 2, 3, 4]
-COL_PINS = [5, 6, 7]
+ROW_PINS = [18, 23, 25, 12]
+COL_PINS = [16, 20, 21]
 
 keypad = Keypad(ROW_PINS, COL_PINS)
 
-# On a separate thread, listen for key presses
 def listen_for_keypress():
+    print("Select a key")
     while True:
         key = keypad.get_key()
         if key:
             print(key[0])
 
-thread = threading.Thread(target=listen_for_keypress)
-thread.start()
+listen_for_keypress()
