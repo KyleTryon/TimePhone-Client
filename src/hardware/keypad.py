@@ -1,4 +1,5 @@
 import RPi.GPIO as GPIO
+from typing import List
 import time
 # defines the 12 key, 7 pin phone keypad
 class Keypad:
@@ -18,6 +19,7 @@ class Keypad:
             [[1209, 852],[1336, 852],[1477, 852]],
             [[1209, 941],[1336, 941],[1477, 941]]
         ]
+        self.history: List[str] = []
         GPIO.setmode(GPIO.BCM)
 
     def get_key(self):
@@ -42,6 +44,7 @@ class Keypad:
                     time.sleep(self.debounceTime)
                     while not GPIO.input(row_pin):
                         time.sleep(self.debounceTime)
+                    self._set_key_history(self.keypad[j][i])
                     return self.keypad[j][i]
 
             # Set column output high
@@ -49,8 +52,10 @@ class Keypad:
 
             # Wait for column to settle
             time.sleep(self.debounceTime)
-
+    # The key history records the last 10 keys pressed. The order is oldest to newest.
+    def _set_key_history(self, key):
+        if len(self.history) >= 10:
+            self.history.pop(0)
+        self.history.append(key)
     def cleanup(self):
         GPIO.cleanup()
-
-
