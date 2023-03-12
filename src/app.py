@@ -1,5 +1,7 @@
 from hardware.keypad import Keypad
 import RPi.GPIO as GPIO
+import threading
+
 GPIO.setwarnings(False)
 # Pin configuration
 ROW_PINS = [18, 23, 25, 12]
@@ -12,6 +14,7 @@ def listen_for_keypress():
     while True:
         key = keypad.get_key()
         if key:
-            print(key[0])
+            print(keypad.history)
 
-listen_for_keypress()
+keypad_thread = threading.Thread(target=listen_for_keypress)
+keypad_thread.start()
