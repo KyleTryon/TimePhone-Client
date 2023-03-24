@@ -2,7 +2,6 @@ from tkinter import *
 import tkinter as tk
 
 import threading
-import time
 
 class Keypad():
        
@@ -11,10 +10,12 @@ class Keypad():
         self.start()
         self.keypad_event = threading.Event()
         self.history = []
+        self.emulator = True
 
 
     def callback(self):
         self.root.quit()
+        self.cleanup()
 
     def run(self):
         self.root = tk.Tk()
@@ -68,15 +69,12 @@ class Keypad():
         
         
     def cleanup(self):
-        self.root.destroy()
+        print('stopping keypad thread')
+        self.root.quit()
 
     def start(self):
         self.thread = threading.Thread(target=self.run)
         self.thread.start()
-
-    def stop(self):
-        self.root.destroy()
-        self.thread.join()
 
     def get_key(self):
         if self.keypad_event.wait(0.1):
@@ -89,7 +87,6 @@ class Keypad():
 
 if __name__ == "__main__":
     keypad = Keypad()
-    time.sleep(10)
     keypad.cleanup()
 
 

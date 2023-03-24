@@ -8,6 +8,7 @@ class Keypad:
         self.debounceTime = 20 / 1000.0
         self.row_pins = row_pins
         self.col_pins = col_pins
+        self.emulator = False
         self.keypad = [
             ['1', '2', '3'],
             ['4', '5', '6'],
