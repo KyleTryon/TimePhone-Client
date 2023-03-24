@@ -4,6 +4,7 @@ import time
 # defines the 12 key, 7 pin phone keypad
 class Keypad:
     def __init__(self, row_pins, col_pins):
+        GPIO.setwarnings(False)
         self.debounceTime = 20 / 1000.0
         self.row_pins = row_pins
         self.col_pins = col_pins

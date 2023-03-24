@@ -1,9 +1,10 @@
-from hardware.keypad import Keypad
+# from hardware.keypad import Keypad
+from hardware.emulateKeypad import Keypad
+
 from services.call_service import CallService
-import RPi.GPIO as GPIO
+
 import threading
 
-GPIO.setwarnings(False)
 # Pin configuration
 ROW_PINS = [18, 23, 25, 12]
 COL_PINS = [16, 20, 21]
